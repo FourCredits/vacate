@@ -1,0 +1,21 @@
+services:
+  app:
+    image: vacate:${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - database
+  database:
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: vacate
+
+volumes:
+  postgres_data:
