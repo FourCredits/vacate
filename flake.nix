@@ -12,7 +12,7 @@
     in {
       devShells.${system}.default = pkgs.mkShell {
         nativeBuildInputs = with pkgs; [
-          dotnetCorePackages.sdk_8_0_1xx
+          dotnetCorePackages.dotnet_8.sdk
         ];
       };
     };
