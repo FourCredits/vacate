@@ -4,8 +4,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    ports:
+      - 8080:8080
     depends_on:
-      - database
+      database:
+        condition: service_healthy
+    secrets:
+      - DatabasePassword
   database:
     image: postgres
     volumes:
@@ -14,8 +19,19 @@ services:
       - 5432:5432
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/DatabasePassword
       POSTGRES_DB: vacate
+    secrets:
+      - DatabasePassword
+    healthcheck:
+      test: ["CMD-SHELL", "psql -U postgres -d vacate -c 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
+
+secrets:
+  DatabasePassword:
+    file: .password
