@@ -1,17 +1,18 @@
 using Microsoft.EntityFrameworkCore;
 using Vacate.Endpoints;
 using Vacate.Persistence;
-using Vacate;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// TODO: don't hardcode connection string
-builder.Services.AddDbContext<VacateContext>(
-    options =>
-        options.UseNpgsql(
-            "Host=localhost;Database=vacate;Username=postgres;Password=postgres"
-        )
+builder.Configuration.AddKeyPerFile("/run/secrets", optional: true);
+
+var password = builder.Configuration.GetValue<string>("DatabasePassword");
+var connectionString =
+    $"Host=localhost;Database=vacate;Username=postgres;Password={password}";
+builder.Services.AddDbContext<VacateContext>(options =>
+    options.UseNpgsql(connectionString)
 );
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -24,6 +25,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
 app.MapPersonEndpoints();
 app.MapProjectEndpoints();
 app.MapAssignmentEndpoints();
