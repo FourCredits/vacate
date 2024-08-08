@@ -7,16 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddKeyPerFile("/run/secrets", optional: true);
 builder.Configuration.AddEnvironmentVariables();
 
-var host = builder.Configuration.GetValue<string>("Database:Host", "localhost");
-var database = builder.Configuration.GetValue<string>("Database:Database", "vacate");
-var username = builder.Configuration.GetValue<string>("Database:Username", "postgres");
-var password = builder.Configuration.GetValue<string>("Database:Password");
-var connectionString =
-    $"Host={host};Database={database};Username={username};Password={password}";
-builder.Services.AddDbContext<VacateContext>(options =>
-    options.UseNpgsql(connectionString)
-);
-
+var connectionString = builder.Configuration.GetConnectionString();
+builder.Services.AddVacateDbContext(connectionString);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
