@@ -10,7 +10,11 @@ services:
       database:
         condition: service_healthy
     secrets:
-      - DatabasePassword
+      - Database__Password
+    environment:
+      Database__Host: database
+      Database__Database: vacate
+      Database__Username: postgres
   database:
     image: postgres
     volumes:
@@ -19,10 +23,10 @@ services:
       - 5432:5432
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD_FILE: /run/secrets/DatabasePassword
+      POSTGRES_PASSWORD_FILE: /run/secrets/Database__Password
       POSTGRES_DB: vacate
     secrets:
-      - DatabasePassword
+      - Database__Password
     healthcheck:
       test: ["CMD-SHELL", "psql -U postgres -d vacate -c 'SELECT 1' || exit 1"]
       interval: 10s
@@ -33,5 +37,5 @@ volumes:
   postgres_data:
 
 secrets:
-  DatabasePassword:
+  Database__Password:
     file: .password

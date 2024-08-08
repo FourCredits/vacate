@@ -5,10 +5,14 @@ using Vacate.Persistence;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddKeyPerFile("/run/secrets", optional: true);
+builder.Configuration.AddEnvironmentVariables();
 
-var password = builder.Configuration.GetValue<string>("DatabasePassword");
+var host = builder.Configuration.GetValue<string>("Database:Host", "localhost");
+var database = builder.Configuration.GetValue<string>("Database:Database", "vacate");
+var username = builder.Configuration.GetValue<string>("Database:Username", "postgres");
+var password = builder.Configuration.GetValue<string>("Database:Password");
 var connectionString =
-    $"Host=localhost;Database=vacate;Username=postgres;Password={password}";
+    $"Host={host};Database={database};Username={username};Password={password}";
 builder.Services.AddDbContext<VacateContext>(options =>
     options.UseNpgsql(connectionString)
 );
@@ -23,8 +27,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseHttpsRedirection();
 
 app.MapPersonEndpoints();
 app.MapProjectEndpoints();
